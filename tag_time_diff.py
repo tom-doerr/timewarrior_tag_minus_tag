@@ -10,11 +10,14 @@ def get_tag_time(tag):
         lines = result.stdout.split('\n')
         for line in lines:
             if 'Total' in line:
-                return line.split()[-1]
+                time_parts = line.split()
+                if len(time_parts) >= 2:
+                    return time_parts[-1]
+        print(f"No time data found for tag '{tag}'")
+        return None
     except subprocess.CalledProcessError:
         print(f"Error: Unable to get time for tag '{tag}'")
-        sys.exit(1)
-    return "0:00:00"
+        return None
 
 def time_to_seconds(time_str):
     """Convert time string (HH:MM:SS) to seconds."""
@@ -36,6 +39,10 @@ def main():
     
     time1 = get_tag_time(tag1)
     time2 = get_tag_time(tag2)
+    
+    if time1 is None or time2 is None:
+        print("Unable to calculate time difference due to missing data.")
+        sys.exit(1)
     
     diff_seconds = time_to_seconds(time1) - time_to_seconds(time2)
     diff_time = seconds_to_time(abs(diff_seconds))
