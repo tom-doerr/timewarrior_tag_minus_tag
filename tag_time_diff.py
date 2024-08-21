@@ -77,18 +77,16 @@ def main():
         diff_seconds = abs(seconds1 - seconds2)
         diff_time = seconds_to_time(diff_seconds)
         
+        print(f"Time for {tag1}: {time1}")
+        print(f"Time for {tag2}: {time2}")
+        print(f"Absolute difference between {tag1} and {tag2}: {diff_time}")
+        
         if time1 == '00:00:00' and time2 == '00:00:00':
-            print(f"Both tags '{tag1}' and '{tag2}' have no tracked time.")
-        else:
-            print(f"Time for {tag1}: {time1}")
-            if time1 == '00:00:00':
-                print(f"No time tracked for tag '{tag1}'")
-            
-            print(f"Time for {tag2}: {time2}")
-            if time2 == '00:00:00':
-                print(f"No time tracked for tag '{tag2}'")
-            
-            print(f"Absolute difference between {tag1} and {tag2}: {diff_time}")
+            print(f"Note: Both tags '{tag1}' and '{tag2}' have no tracked time.")
+        elif time1 == '00:00:00':
+            print(f"Note: No time tracked for tag '{tag1}'")
+        elif time2 == '00:00:00':
+            print(f"Note: No time tracked for tag '{tag2}'")
     else:
         parser.print_help()
         sys.exit(1)
