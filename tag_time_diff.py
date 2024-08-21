@@ -7,19 +7,22 @@ def get_tag_time(tag):
     """Get the total time for a given tag using Timewarrior."""
     try:
         result = subprocess.run(['timew', 'summary', tag], capture_output=True, text=True, check=True)
+        print(f"Raw output for tag '{tag}':")
+        print(result.stdout)
         lines = result.stdout.split('\n')
         for line in lines:
-            if 'Total' in line:
+            if 'Tracked' in line:
                 time_parts = line.split()
                 if len(time_parts) >= 2:
                     # Extract only the time part (HH:MM:SS)
-                    time_str = time_parts[-1]
+                    time_str = time_parts[1]
                     if ':' in time_str:
                         return time_str
         print(f"No valid time data found for tag '{tag}'")
         return None
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError as e:
         print(f"Error: Unable to get time for tag '{tag}'")
+        print(f"Error message: {e}")
         return None
 
 def time_to_seconds(time_str):
