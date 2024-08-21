@@ -17,12 +17,11 @@ def get_tag_time(tag):
         if total_time:
             return total_time
         else:
-            print(f"No valid time data found for tag '{tag}'")
-            return None
+            return '00:00:00'
     except subprocess.CalledProcessError as e:
         print(f"Error: Unable to get time for tag '{tag}'")
         print(f"Error message: {e}")
-        return None
+        return '00:00:00'
 
 def time_to_seconds(time_str):
     """Convert time string (HH:MM:SS) to seconds."""
@@ -49,22 +48,20 @@ def main():
     time1 = get_tag_time(tag1)
     time2 = get_tag_time(tag2)
     
-    if time1 is None or time2 is None:
-        print("Unable to calculate time difference due to missing data.")
-        sys.exit(1)
-    
     seconds1 = time_to_seconds(time1)
     seconds2 = time_to_seconds(time2)
-    
-    if seconds1 is None or seconds2 is None:
-        print("Unable to calculate time difference due to invalid time data.")
-        sys.exit(1)
     
     diff_seconds = abs(seconds1 - seconds2)
     diff_time = seconds_to_time(diff_seconds)
     
     print(f"Time for {tag1}: {time1}")
+    if time1 == '00:00:00':
+        print(f"No time tracked for tag '{tag1}'")
+    
     print(f"Time for {tag2}: {time2}")
+    if time2 == '00:00:00':
+        print(f"No time tracked for tag '{tag2}'")
+    
     print(f"Absolute difference between {tag1} and {tag2}: {diff_time}")
 
 if __name__ == "__main__":
