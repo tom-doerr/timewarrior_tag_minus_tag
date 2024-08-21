@@ -7,19 +7,18 @@ def get_tag_time(tag):
     """Get the total time for a given tag using Timewarrior."""
     try:
         result = subprocess.run(['timew', 'summary', tag], capture_output=True, text=True, check=True)
-        print(f"Raw output for tag '{tag}':")
-        print(result.stdout)
         lines = result.stdout.split('\n')
+        total_time = None
         for line in lines:
-            if 'Tracked' in line:
-                time_parts = line.split()
-                if len(time_parts) >= 2:
-                    # Extract only the time part (HH:MM:SS)
-                    time_str = time_parts[1]
-                    if ':' in time_str:
-                        return time_str
-        print(f"No valid time data found for tag '{tag}'")
-        return None
+            if line.strip().startswith('Total'):
+                total_time = line.strip().split()[-1]
+                break
+        
+        if total_time:
+            return total_time
+        else:
+            print(f"No valid time data found for tag '{tag}'")
+            return None
     except subprocess.CalledProcessError as e:
         print(f"Error: Unable to get time for tag '{tag}'")
         print(f"Error message: {e}")
@@ -61,12 +60,12 @@ def main():
         print("Unable to calculate time difference due to invalid time data.")
         sys.exit(1)
     
-    diff_seconds = seconds1 - seconds2
-    diff_time = seconds_to_time(abs(diff_seconds))
+    diff_seconds = abs(seconds1 - seconds2)
+    diff_time = seconds_to_time(diff_seconds)
     
     print(f"Time for {tag1}: {time1}")
     print(f"Time for {tag2}: {time2}")
-    print(f"Difference ({tag1} - {tag2}): {'-' if diff_seconds < 0 else ''}{diff_time}")
+    print(f"Absolute difference between {tag1} and {tag2}: {diff_time}")
 
 if __name__ == "__main__":
     main()
