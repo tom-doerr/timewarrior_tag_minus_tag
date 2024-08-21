@@ -62,7 +62,10 @@ def main():
     if time2 == '00:00:00':
         print(f"No time tracked for tag '{tag2}'")
     
-    print(f"Absolute difference between {tag1} and {tag2}: {diff_time}")
+    if time1 == '00:00:00' and time2 == '00:00:00':
+        print(f"Both tags '{tag1}' and '{tag2}' have no tracked time.")
+    else:
+        print(f"Absolute difference between {tag1} and {tag2}: {diff_time}")
 
 if __name__ == "__main__":
     main()
