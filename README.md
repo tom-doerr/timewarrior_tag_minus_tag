@@ -27,7 +27,7 @@ A command-line tool to compare time tracked between different Timewarrior tags
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/yourusername/timewarrior-tag-comparator.git
+git clone https://github.com/tom-doerr/timewarrior-tag-comparator.git
 cd timewarrior-tag-comparator
 ```
 
@@ -84,6 +84,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 <div align="center">
 
-Made with ❤️ by [Your Name]
+Made with ❤️ by [Tom Dörr](https://github.com/tom-doerr)
 
 </div>
