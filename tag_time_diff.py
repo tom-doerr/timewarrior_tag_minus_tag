@@ -37,7 +37,7 @@ def get_tag_time(tag):
             pass
 
         # Get all intervals for today and yesterday to ensure we catch everything
-        result = subprocess.run(['timew', 'export', 'yesterday - tomorrow'], 
+        result = subprocess.run(['timew', 'export', 'today - tomorrow'], 
                               capture_output=True, 
                               text=True, 
                               check=True,
