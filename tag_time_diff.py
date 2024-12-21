@@ -36,8 +36,8 @@ def get_tag_time(tag):
             # This is fine, it just means no active tracking
             pass
 
-        # Get all intervals for today and yesterday to ensure we catch everything
-        result = subprocess.run(['timew', 'export', 'today - tomorrow'], 
+        # Get all intervals for today
+        result = subprocess.run(['timew', 'export', ':day'], 
                               capture_output=True, 
                               text=True, 
                               check=True,
@@ -100,7 +100,7 @@ def seconds_to_time(seconds):
 def get_total_time():
     """Get the total tracked time for all tags using export."""
     try:
-        result = subprocess.run(['timew', 'export', 'yesterday - tomorrow'], 
+        result = subprocess.run(['timew', 'export', ':day'], 
                               capture_output=True, 
                               text=True, 
                               check=True,
