@@ -4,24 +4,57 @@ import subprocess
 import sys
 import argparse
 
+def validate_tag(tag):
+    """Validate tag name."""
+    if not tag or not isinstance(tag, str):
+        raise ValueError("Tag must be a non-empty string")
+    if len(tag.strip()) == 0:
+        raise ValueError("Tag cannot be only whitespace")
+    return tag.strip()
+
 def get_tag_time(tag):
     """Get the total time for a given tag using Timewarrior."""
     try:
-        result = subprocess.run(['timew', 'summary', tag], capture_output=True, text=True, check=True)
+        tag = validate_tag(tag)
+        # Check if timewarrior is installed
+        try:
+            subprocess.run(['timew'], capture_output=True, check=True, timeout=1)
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            print("Error: Timewarrior (timew) is not installed or not accessible")
+            sys.exit(1)
+        
+        result = subprocess.run(['timew', 'summary', tag], 
+                              capture_output=True, 
+                              text=True, 
+                              check=True,
+                              timeout=5)  # 5 second timeout
+        
         lines = result.stdout.split('\n')
         total_time = None
         for line in lines:
             if line.strip().startswith('Total'):
-                total_time = line.strip().split()[-1]
+                parts = line.strip().split()
+                if len(parts) >= 2:
+                    total_time = parts[-1]
+                    # Ensure time format is HH:MM:SS
+                    if ':' not in total_time:
+                        return '00:00:00'
+                    # Pad hours if needed
+                    if total_time.count(':') == 2:
+                        h, m, s = total_time.split(':')
+                        total_time = f"{int(h):02d}:{int(m):02d}:{int(s):02d}"
                 break
         
-        if total_time:
-            return total_time
-        else:
-            return '00:00:00'
+        return total_time if total_time else '00:00:00'
+    except subprocess.TimeoutExpired:
+        print(f"Error: Command timed out while getting time for tag '{tag}'")
+        return '00:00:00'
     except subprocess.CalledProcessError as e:
         print(f"Error: Unable to get time for tag '{tag}'")
         print(f"Error message: {e}")
+        return '00:00:00'
+    except Exception as e:
+        print(f"Unexpected error while processing tag '{tag}': {e}")
         return '00:00:00'
 
 def time_to_seconds(time_str):
@@ -42,18 +75,45 @@ def seconds_to_time(seconds):
 def get_total_time():
     """Get the total tracked time for all tags."""
     try:
-        result = subprocess.run(['timew', 'summary'], capture_output=True, text=True, check=True)
+        # Check if timewarrior is installed
+        try:
+            subprocess.run(['timew'], capture_output=True, check=True, timeout=1)
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            print("Error: Timewarrior (timew) is not installed or not accessible")
+            sys.exit(1)
+            
+        result = subprocess.run(['timew', 'summary'], 
+                              capture_output=True, 
+                              text=True, 
+                              check=True,
+                              timeout=5)  # 5 second timeout
+        
         lines = result.stdout.split('\n')
         total_time = None
         for line in lines:
             if line.strip().startswith('Total'):
-                total_time = line.strip().split()[-1]
+                parts = line.strip().split()
+                if len(parts) >= 2:
+                    total_time = parts[-1]
+                    # Ensure time format is HH:MM:SS
+                    if ':' not in total_time:
+                        return '00:00:00'
+                    # Pad hours if needed
+                    if total_time.count(':') == 2:
+                        h, m, s = total_time.split(':')
+                        total_time = f"{int(h):02d}:{int(m):02d}:{int(s):02d}"
                 break
         
         return total_time if total_time else '00:00:00'
+    except subprocess.TimeoutExpired:
+        print("Error: Command timed out while getting total time")
+        return '00:00:00'
     except subprocess.CalledProcessError as e:
         print(f"Error: Unable to get total time")
         print(f"Error message: {e}")
+        return '00:00:00'
+    except Exception as e:
+        print(f"Unexpected error while getting total time: {e}")
         return '00:00:00'
 
 def main():
