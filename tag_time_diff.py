@@ -47,10 +47,19 @@ def get_tag_time(tag):
             # Parse time entries
             parts = line.strip().split()
             if len(parts) >= 7:  # Line contains a time entry
-                time_str = parts[-2] if parts[-2] != '-' else '0:00:00'
-                if ':' in time_str:
-                    h, m, s = map(int, time_str.split(':'))
-                    total_seconds += h * 3600 + m * 60 + s
+                # Check if this is an ongoing tracking entry
+                if parts[-2] == '-':
+                    # Get current time from timewarrior
+                    now = subprocess.run(['timew', 'get', 'dom.active.duration'], 
+                                      capture_output=True, text=True, check=True).stdout.strip()
+                    if ':' in now:
+                        h, m, s = map(int, now.split(':'))
+                        total_seconds += h * 3600 + m * 60 + s
+                else:
+                    time_str = parts[-2]
+                    if ':' in time_str:
+                        h, m, s = map(int, time_str.split(':'))
+                        total_seconds += h * 3600 + m * 60 + s
         
         if total_seconds == 0:
             return '00:00:00'
