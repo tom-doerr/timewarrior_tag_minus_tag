@@ -36,28 +36,38 @@ def get_tag_time(tag):
                               check=True,
                               timeout=5)  # 5 second timeout
         
-        lines = result.stdout.split('\n')
+        # Get the total from timewarrior's summary
         total_seconds = 0
         
+        # First try to get the total directly from the summary footer
+        lines = result.stdout.split('\n')
         for line in lines:
-            # Skip header lines and empty lines
-            if not line.strip() or '[4m' in line or line.startswith('Wk') or line.startswith('--'):
-                continue
-                
-            # Parse time entries
-            parts = line.strip().split()
-            if len(parts) >= 7:  # Line contains a time entry
-                # Check if this is an ongoing tracking entry
-                if parts[-2] == '-':
-                    # Get current time from timewarrior
-                    now = subprocess.run(['timew', 'get', 'dom.active.duration'], 
-                                      capture_output=True, text=True, check=True).stdout.strip()
-                    if ':' in now:
-                        h, m, s = map(int, now.split(':'))
-                        total_seconds += h * 3600 + m * 60 + s
-                else:
+            if line.strip() and not line.startswith('Wk') and not '[4m' in line:
+                parts = line.strip().split()
+                if len(parts) >= 1 and ':' in parts[-1]:  # Look for the last time value
+                    try:
+                        h, m, s = map(int, parts[-1].split(':'))
+                        total_seconds = h * 3600 + m * 60 + s
+                        break
+                    except (ValueError, IndexError):
+                        continue
+        
+        # If no total was found, calculate from individual entries
+        if total_seconds == 0:
+            for line in lines:
+                if not line.strip() or '[4m' in line or line.startswith('Wk'):
+                    continue
+                    
+                parts = line.strip().split()
+                if len(parts) >= 7:  # Line contains a time entry
                     time_str = parts[-2]
-                    if ':' in time_str:
+                    if time_str == '-':  # Ongoing tracking
+                        now = subprocess.run(['timew', 'get', 'dom.active.duration'], 
+                                          capture_output=True, text=True, check=True).stdout.strip()
+                        if ':' in now:
+                            h, m, s = map(int, now.split(':'))
+                            total_seconds = h * 3600 + m * 60 + s
+                    elif ':' in time_str:
                         h, m, s = map(int, time_str.split(':'))
                         total_seconds += h * 3600 + m * 60 + s
         
