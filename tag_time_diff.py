@@ -3,6 +3,7 @@
 import subprocess
 import sys
 import argparse
+import time
 
 def validate_tag(tag):
     """Validate tag name."""
