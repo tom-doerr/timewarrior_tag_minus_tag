@@ -156,7 +156,7 @@ def main():
         
         print(f"Time for {tag1}: {time1}")
         print(f"Time for {tag2}: {time2}")
-        print(f"Difference ({tag1} compared to {tag2}): {'-' if diff_seconds < 0 else '+'}{diff_time}")
+        print(f"Difference ({tag1} compared to {tag2}): {'-' if diff_seconds < 0 else ''}{diff_time}")
         
         if time1 == '00:00:00' and time2 == '00:00:00':
             print(f"Note: Both tags '{tag1}' and '{tag2}' have no tracked time.")
