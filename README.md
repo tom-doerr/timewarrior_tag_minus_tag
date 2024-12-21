@@ -121,26 +121,3 @@ Made with ❤️ by [Tom Dörr](https://github.com/tom-doerr)
 
 </div>
 
-## 🤝 Contributing
-
-Contributions are welcome! Feel free to:
-
-1. Fork the repository
-2. Create a new branch
-3. Make your changes
-4. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- [Timewarrior](https://timewarrior.net/) for the excellent time tracking tool
-- The Python community for the amazing standard library
-
-<div align="center">
-
-Made with ❤️ by [Tom Dörr](https://github.com/tom-doerr)
-
-</div>
