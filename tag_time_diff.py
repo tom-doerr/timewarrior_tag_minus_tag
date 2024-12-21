@@ -18,9 +18,16 @@ def get_tag_time(tag):
         tag = validate_tag(tag)
         # Check if timewarrior is installed
         try:
-            subprocess.run(['timew'], capture_output=True, check=True, timeout=1)
-        except (subprocess.CalledProcessError, FileNotFoundError):
-            print("Error: Timewarrior (timew) is not installed or not accessible")
+            result = subprocess.run(['timew'], capture_output=True, text=True, timeout=1)
+            if "There is no active time tracking." in result.stdout:
+                # This is fine, we can continue
+                pass
+        except FileNotFoundError:
+            print("Error: Timewarrior (timew) is not installed")
+            print("Install it with: sudo apt install timewarrior")
+            sys.exit(1)
+        except subprocess.CalledProcessError:
+            print("Error: Problem accessing Timewarrior")
             sys.exit(1)
         
         result = subprocess.run(['timew', 'summary', tag], 
@@ -143,10 +150,13 @@ def main():
         
         if time1 == '00:00:00' and time2 == '00:00:00':
             print(f"Note: Both tags '{tag1}' and '{tag2}' have no tracked time.")
+            print("To start tracking time, use: timew start <tag>")
         elif time1 == '00:00:00':
             print(f"Note: No time tracked for tag '{tag1}'")
+            print(f"To start tracking time for {tag1}, use: timew start {tag1}")
         elif time2 == '00:00:00':
             print(f"Note: No time tracked for tag '{tag2}'")
+            print(f"To start tracking time for {tag2}, use: timew start {tag2}")
     else:
         parser.print_help()
         sys.exit(1)
