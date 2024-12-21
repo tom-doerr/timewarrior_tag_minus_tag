@@ -37,20 +37,28 @@ def get_tag_time(tag):
                               timeout=5)  # 5 second timeout
         
         lines = result.stdout.split('\n')
-        total_time = None
+        total_seconds = 0
+        
         for line in lines:
-            if line.strip().startswith('Total'):
-                parts = line.strip().split()
-                if len(parts) >= 2:
-                    total_time = parts[-1]
-                    # Ensure time format is HH:MM:SS
-                    if ':' not in total_time:
-                        return '00:00:00'
-                    # Pad hours if needed
-                    if total_time.count(':') == 2:
-                        h, m, s = total_time.split(':')
-                        total_time = f"{int(h):02d}:{int(m):02d}:{int(s):02d}"
-                break
+            # Skip header lines and empty lines
+            if not line.strip() or '[4m' in line or line.startswith('Wk') or line.startswith('--'):
+                continue
+                
+            # Parse time entries
+            parts = line.strip().split()
+            if len(parts) >= 7:  # Line contains a time entry
+                time_str = parts[-2] if parts[-2] != '-' else '0:00:00'
+                if ':' in time_str:
+                    h, m, s = map(int, time_str.split(':'))
+                    total_seconds += h * 3600 + m * 60 + s
+        
+        if total_seconds == 0:
+            return '00:00:00'
+            
+        # Convert total seconds back to HH:MM:SS
+        h, r = divmod(total_seconds, 3600)
+        m, s = divmod(r, 60)
+        total_time = f"{int(h):02d}:{int(m):02d}:{int(s):02d}"
         
         return total_time if total_time else '00:00:00'
     except subprocess.TimeoutExpired:
